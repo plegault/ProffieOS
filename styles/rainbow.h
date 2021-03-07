@@ -13,6 +13,9 @@ public:
   SimpleColor getColor(int led) {
     Color16 c(std::max(0, (sin_table[((m * 3 + led * 50)) & 0x3ff] << 2)),
               std::max(0, (sin_table[((m * 3 + led * 50 + 1024 / 3)) & 0x3ff] << 2)),
+              std::max(0, (sin_table[((m * 3 + led * 50 + 1024 * 2 / 3)) & 0x3ff] << 2)),
+              std::max(0, (sin_table[((m * 3 + led * 50 + 1024 * 2 / 3)) & 0x3ff] << 2)),
+              std::max(0, (sin_table[((m * 3 + led * 50 + 1024 * 2 / 3)) & 0x3ff] << 2)),
               std::max(0, (sin_table[((m * 3 + led * 50 + 1024 * 2 / 3)) & 0x3ff] << 2)));
     return SimpleColor(c);
   }

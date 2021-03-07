@@ -5,144 +5,156 @@
 // Note that these colors are in linear space and their interpretation
 // depends on the blade.
 class Color8 {
-  public:
-  Color8() : r(0), g(0), b(0) {}
-  Color8(uint8_t r_, uint8_t g_, uint8_t b_) : r(r_), g(g_), b(b_) {}
-  // x = 0..256
-  Color8 mix(const Color8& other, int x) const {
-    // Wonder if there is an instruction for this?
-    return Color8( ((256-x) * r + x * other.r) >> 8,
-                   ((256-x) * g + x * other.g) >> 8,
-                   ((256-x) * b + x * other.b) >> 8);
-  }
-  // x = 0..16384
-  Color8 mix2(const Color8& other, int x) const {
-    // Wonder if there is an instruction for this?
-    return Color8( ((16384-x) * r + x * other.r) >> 14,
-                   ((16384-x) * g + x * other.g) >> 14,
-                   ((16384-x) * b + x * other.b) >> 14);
-  }
-  // x = 0..32768
-  Color8 mix3(const Color8& other, int x) const {
-    // Wonder if there is an instruction for this?
-    return Color8( ((32768-x) * r + x * other.r) >> 15,
-                   ((32768-x) * g + x * other.g) >> 15,
-                   ((32768-x) * b + x * other.b) >> 15);
-  }
-  uint8_t select(const Color8& other) const {
-    uint8_t ret = 255;
-    if (other.r) ret = std::min<int>(ret, r * 255 / other.r);
-    if (other.g) ret = std::min<int>(ret, g * 255 / other.g);
-    if (other.b) ret = std::min<int>(ret, b * 255 / other.b);
-    return ret;
-  }
-
-  enum Byteorder {
-    NONE = 0,
-
-    // RGB colors
-    BGR=0x321,
-    BRG=0x312,
-    GBR=0x231,
-    GRB=0x213,
-    RBG=0x132,
-    RGB=0x123,
-
-    // RGBW colors
-    BGRW=0x3214,
-    BRGW=0x3124,
-    GBRW=0x2314,
-    GRBW=0x2134,
-    RBGW=0x1324,
-    RGBW=0x1234,
-
-    WBGR=0x4321,
-    WBRG=0x4312,
-    WGBR=0x4231,
-    WGRB=0x4213,
-    WRBG=0x4132,
-    WRGB=0x4123,
-
-    // Energy-efficient RGBW colors (white *replaces RGB, not in addition to RGB)
-    BGRw=0x7654,
-    BRGw=0x7564,
-    GBRw=0x6754,
-    GRBw=0x6574,
-    RBGw=0x5764,
-    RGBw=0x5674,
-
-    wBGR=0x4765,
-    wBRG=0x4756,
-    wGBR=0x4675,
-    wGRB=0x4657,
-    wRBG=0x4576,
-    wRGB=0x4567,
-  };
-
-  static int num_bytes(int byteorder) {
-    return byteorder <= 0xfff ? 3 : 4;
-  }
-
-  static constexpr int inline_num_bytes(int byteorder) __attribute__((always_inline)) {
-    return byteorder <= 0xfff ? 3 : 4;
-  }
-
-
-  uint8_t getByte(int byteorder, int byte) {
-    switch (byteorder >> (byte * 4) & 0x7) {
-      default: return r;
-      case 2: return g;
-      case 3: return b;
-      case 4: return std::min(r, std::min(g, b));
-      case 5: return r - std::min(r, std::min(g, b));
-      case 6: return g - std::min(r, std::min(g, b));
-      case 7: return b - std::min(r, std::min(g, b));
+public:
+    Color8() : r(0), g(0), b(0), a(0), w(0), u(0) {}
+    Color8(uint8_t r_, uint8_t g_, uint8_t b_, uint8_t a_, uint8_t w_, uint8_t u_) : r(r_), g(g_), b(b_), a(a_), w(w_), u(u_) {}
+    // x = 0..256
+    Color8 mix(const Color8& other, int x) const {
+        // Wonder if there is an instruction for this?
+        return Color8(((256 - x) * r + x * other.r) >> 8,
+            ((256 - x) * g + x * other.g) >> 8,
+            ((256 - x) * b + x * other.b) >> 8,
+            ((256 - x) * a + x * other.a) >> 8,
+            ((256 - x) * w + x * other.w) >> 8,
+            ((256 - x) * u + x * other.u) >> 8);
     }
-  }
-  
-  // RGB combine X = X
-  static Byteorder combine_byteorder(int byteorder1, int byteorder2) {
-    int ret = 0;
-    for (int i = num_bytes(byteorder1) - 1; i >= 0; i--) {
-      int b = (byteorder1 >> (i * 4) & 7);
-      int pos = 3 - b;
-      b = byteorder2 >> (pos * 4) & 7;
-      ret |= b << (i * 4);
+    // x = 0..16384
+    Color8 mix2(const Color8& other, int x) const {
+        // Wonder if there is an instruction for this?
+        return Color8(((16384 - x) * r + x * other.r) >> 14,
+            ((16384 - x) * g + x * other.g) >> 14,
+            ((16384 - x) * b + x * other.b) >> 14,
+            ((16384 - x) * a + x * other.a) >> 14,
+            ((16384 - x) * w + x * other.w) >> 14,
+            ((16384 - x) * u + x * other.u) >> 14);
     }
-    return (Byteorder)ret;
-  }
-
-  // invert(X) combine X = RGB
-  // invert(RGB) = RGB
-  static Byteorder invert_byteorder(int byteorder) {
-    int ret = 0;
-    for (int i = num_bytes(byteorder) - 1; i >= 0; i--) {
-      int b = byteorder >> (i * 4) & 7;
-      int pos = 3 - b;
-      ret |= (3-i) << (pos * 4);
+    // x = 0..32768
+    Color8 mix3(const Color8& other, int x) const {
+        // Wonder if there is an instruction for this?
+        return Color8(((32768 - x) * r + x * other.r) >> 15,
+            ((32768 - x) * g + x * other.g) >> 15,
+            ((32768 - x) * b + x * other.b) >> 15,
+            ((32768 - x) * a + x * other.a) >> 15,
+            ((32768 - x) * w + x * other.w) >> 15,
+            ((32768 - x) * u + x * other.u) >> 15);
     }
-    return (Byteorder)ret;
-  }
+    uint8_t select(const Color8& other) const {
+        uint8_t ret = 255;
+        if (other.r) ret = std::min<int>(ret, r * 255 / other.r);
+        if (other.g) ret = std::min<int>(ret, g * 255 / other.g);
+        if (other.b) ret = std::min<int>(ret, b * 255 / other.b);
+        if (other.a) ret = std::min<int>(ret, a * 255 / other.a);
+        if (other.w) ret = std::min<int>(ret, w * 255 / other.w);
+        if (other.u) ret = std::min<int>(ret, u * 255 / other.u);
+        return ret;
+    }
 
-  Color8 operator*(uint8_t v) const {
-    return Color8(r * v / 255, g * v / 255, b * v / 255);
-  }
+    enum Byteorder {
+        NONE = 0,
 
-  Color8 operator|(const Color8& other) const {
-    return Color8(std::max(r, other.r), std::max(g, other.g), std::max(b, other.b));
-  }
+        // RGB colors
+        BGR = 0x321,
+        BRG = 0x312,
+        GBR = 0x231,
+        GRB = 0x213,
+        RBG = 0x132,
+        RGB = 0x123,
 
-  void printTo(Print& p) {
-    p.write('#');
-    if (r < 16) p.write('0');
-    p.print(r, HEX);
-    if (g < 16) p.write('0');
-    p.print(g, HEX);
-    if (b < 16) p.write('0');
-    p.print(b, HEX);
-  }
+        // RGBW colors
+        BGRW = 0x3214,
+        BRGW = 0x3124,
+        GBRW = 0x2314,
+        GRBW = 0x2134,
+        RBGW = 0x1324,
+        RGBW = 0x1234,
 
-  uint8_t r, g, b;
+        WBGR = 0x4321,
+        WBRG = 0x4312,
+        WGBR = 0x4231,
+        WGRB = 0x4213,
+        WRBG = 0x4132,
+        WRGB = 0x4123,
+
+        // Energy-efficient RGBW colors (white *replaces RGB, not in addition to RGB)
+        BGRw = 0x7654,
+        BRGw = 0x7564,
+        GBRw = 0x6754,
+        GRBw = 0x6574,
+        RBGw = 0x5764,
+        RGBw = 0x5674,
+
+        wBGR = 0x4765,
+        wBRG = 0x4756,
+        wGBR = 0x4675,
+        wGRB = 0x4657,
+        wRBG = 0x4576,
+        wRGB = 0x4567,
+    };
+
+    static int num_bytes(int byteorder) {
+        return byteorder <= 0xfff ? 3 : 4;
+    }
+
+    static constexpr int inline_num_bytes(int byteorder) __attribute__((always_inline)) {
+        return byteorder <= 0xfff ? 3 : 4;
+    }
+
+
+    uint8_t getByte(int byteorder, int byte) {
+        switch (byteorder >> (byte * 4) & 0x7) {
+        default: return r;
+        case 2: return g;
+        case 3: return b;
+        case 4: return std::min(r, std::min(g, b));
+        case 5: return r - std::min(r, std::min(g, b));
+        case 6: return g - std::min(r, std::min(g, b));
+        case 7: return b - std::min(r, std::min(g, b));
+        }
+    }
+
+    // RGB combine X = X
+    static Byteorder combine_byteorder(int byteorder1, int byteorder2) {
+        int ret = 0;
+        for (int i = num_bytes(byteorder1) - 1; i >= 0; i--) {
+            int b = (byteorder1 >> (i * 4) & 7);
+            int pos = 3 - b;
+            b = byteorder2 >> (pos * 4) & 7;
+            ret |= b << (i * 4);
+        }
+        return (Byteorder)ret;
+    }
+
+    // invert(X) combine X = RGB
+    // invert(RGB) = RGB
+    static Byteorder invert_byteorder(int byteorder) {
+        int ret = 0;
+        for (int i = num_bytes(byteorder) - 1; i >= 0; i--) {
+            int b = byteorder >> (i * 4) & 7;
+            int pos = 3 - b;
+            ret |= (3 - i) << (pos * 4);
+        }
+        return (Byteorder)ret;
+    }
+
+    Color8 operator*(uint8_t v) const {
+        return Color8(r * v / 255, g * v / 255, b * v / 255, a * v / 255, w * v / 255, u * v / 255);
+    }
+
+    Color8 operator|(const Color8& other) const {
+        return Color8(std::max(r, other.r), std::max(g, other.g), std::max(b, other.b), std::max(a, other.a), std::max(w, other.w), std::max(u, other.u));
+    }
+
+    void printTo(Print& p) {
+        p.write('#');
+        if (r < 16) p.write('0');
+        p.print(r, HEX);
+        if (g < 16) p.write('0');
+        p.print(g, HEX);
+        if (b < 16) p.write('0');
+        p.print(b, HEX);
+    }
+
+    uint8_t r, g, b, a, w, u;
 };
 
 template<int N> inline uint8_t GETBYTEN(const Color8& rgb)  __attribute__((always_inline));
@@ -165,20 +177,8 @@ template<int BYTEORDER, int byte> static inline uint8_t GETBYTE(const Color8& rg
   return GETBYTEN<((BYTEORDER >> (byte * 4)) & 0x7)>(rgb);
 }
 
-class HSL {
-public:
-  HSL() : H(0), S(0), L(0) {}
-  HSL(float h, float s, float l) : H(h), S(s), L(l) {}
-  HSL rotate(float angle) {
-    return HSL(fract(H + angle), S, L);
-  }
-  float H; // 0 - 1.0
-  float S; // 0 - 1.0
-  float L; // 0 - 1.0
-};
 
-
-static int8_t color16_dither_matrix[4][4] = {
+static int8_t Color16_dither_matrix[4][4] = {
   { -127, 111,  -76,  94 },
   {    9, -59,   60,  -8 },
   {  -93,  77, -110, 127 },
@@ -186,164 +186,152 @@ static int8_t color16_dither_matrix[4][4] = {
 };
 
 class Color16 {
-  public:
-  constexpr Color16() : r(0), g(0), b(0) {}
-  Color16(const Color8& c) : r(c.r * 0x101), g(c.g * 0x101), b(c.b * 0x101) {}
-  constexpr Color16(uint16_t r_, uint16_t g_, uint16_t b_) : r(r_), g(g_), b(b_) {}
-  // x = 0..256
-  Color16 mix(const Color16& other, int x) const {
-    // Wonder if there is an instruction for this?
-    return Color16( ((256-x) * r + x * other.r) >> 8,
-                    ((256-x) * g + x * other.g) >> 8,
-                    ((256-x) * b + x * other.b) >> 8);
-  }
-  Color16 mix_clamped(const Color16& other, int x) const {
-    // Wonder if there is an instruction for this?
-    return Color16( clampi32(((256-x) * r + x * other.r) >> 8, 0, 65536),
-                    clampi32(((256-x) * g + x * other.g) >> 8, 0, 65536),
-                    clampi32(((256-x) * b + x * other.b) >> 8, 0, 65536));
-  }
-  // x = 0..16384
-  Color16 mix2(const Color16& other, int x) const {
-    // Wonder if there is an instruction for this?
-    return Color16( ((16384-x) * r + x * other.r) >> 14,
-                    ((16384-x) * g + x * other.g) >> 14,
-                    ((16384-x) * b + x * other.b) >> 14);
-  }
-  // x = 0..32768
-  Color16 mix3(const Color16& other, int x) const {
-    // Wonder if there is an instruction for this?
-    return Color16(((32768-x) * r + x * other.r) >> 15,
-                   ((32768-x) * g + x * other.g) >> 15,
-                   ((32768-x) * b + x * other.b) >> 15);
-  }
-  uint16_t select(const Color16& other) const {
-    uint32_t ret = 65535;
-    uint32_t tmp = 65535;
-    if (other.r) ret = std::min<uint32_t>(ret, r * tmp / other.r);
-    if (other.g) ret = std::min<uint32_t>(ret, g * tmp / other.g);
-    if (other.b) ret = std::min<uint32_t>(ret, b * tmp / other.b);
-    return ret;
-  }
-
-  Color8 dither(int n) const {
+public:
+    constexpr Color16() : r(0), g(0), b(0), a(0), w(0), u(0) {}
+    Color16(const Color8& c) : r(c.r * 0x101), g(c.g * 0x101), b(c.b * 0x101), a(c.a * 0x101), w(c.w * 0x101), u(c.u * 0x101) {}
+    constexpr Color16(uint16_t r_, uint16_t g_, uint16_t b_, uint16_t a_, uint16_t w_, uint16_t u_) : r(r_), g(g_), b(b_), a(a_), w(w_), u(u_) {}
+    // x = 0..256
+    Color16 mix(const Color16& other, int x) const {
+        // Wonder if there is an instruction for this?
+        return Color16(((256 - x) * r + x * other.r) >> 8,
+            ((256 - x) * g + x * other.g) >> 8,
+            ((256 - x) * b + x * other.b) >> 8,
+            ((256 - x) * a + x * other.a) >> 8,
+            ((256 - x) * w + x * other.w) >> 8,
+            ((256 - x) * u + x * other.u) >> 8);
+    }
+    Color16 mix_clamped(const Color16& other, int x) const {
+        // Wonder if there is an instruction for this?
+        return Color16(clampi32(((256 - x) * r + x * other.r) >> 8, 0, 65536),
+            clampi32(((256 - x) * g + x * other.g) >> 8, 0, 65536),
+            clampi32(((256 - x) * b + x * other.b) >> 8, 0, 65536),
+            clampi32(((256 - x) * a + x * other.a) >> 8, 0, 65536),
+            clampi32(((256 - x) * w + x * other.w) >> 8, 0, 65536),
+            clampi32(((256 - x) * u + x * other.u) >> 8, 0, 65536));
+    }
+    // x = 0..16384
+    Color16 mix2(const Color16& other, int x) const {
+        // Wonder if there is an instruction for this?
+        return Color16(((16384 - x) * r + x * other.r) >> 14,
+            ((16384 - x) * g + x * other.g) >> 14,
+            ((16384 - x) * b + x * other.b) >> 14,
+            ((16384 - x) * a + x * other.a) >> 14,
+            ((16384 - x) * w + x * other.w) >> 14,
+            ((16384 - x) * u + x * other.u) >> 14);
+    }
+    // x = 0..32768
+    Color16 mix3(const Color16& other, int x) const {
+        // Wonder if there is an instruction for this?
+        return Color16(((32768 - x) * r + x * other.r) >> 15,
+            ((32768 - x) * g + x * other.g) >> 15,
+            ((32768 - x) * b + x * other.b) >> 15,
+            ((32768 - x) * a + x * other.a) >> 15,
+            ((32768 - x) * w + x * other.w) >> 15,
+            ((32768 - x) * u + x * other.u) >> 15);
+    }
+    uint16_t select(const Color16& other) const {
+        uint32_t ret = 65535;
+        uint32_t tmp = 65535;
+        if (other.r) ret = std::min<uint32_t>(ret, r * tmp / other.r);
+        if (other.g) ret = std::min<uint32_t>(ret, g * tmp / other.g);
+        if (other.b) ret = std::min<uint32_t>(ret, b * tmp / other.b);
+        if (other.a) ret = std::min<uint32_t>(ret, a * tmp / other.a);
+        if (other.w) ret = std::min<uint32_t>(ret, w * tmp / other.w);
+        if (other.u) ret = std::min<uint32_t>(ret, u * tmp / other.u);
+        return ret;
+    }
+    //Color8? or 16
+    Color8 dither(int n) const {
 #if (__CORTEX_M - 0 >= 0x04U)  /* only for Cortex-M4 and above */
-    if (n < 0) {
-      return Color8(__UQSUB16(r, -n) >> 8,
-		    __UQSUB16(g, -n) >> 8,
-		    __UQSUB16(b, -n) >> 8);
-    } else {
-      return Color8(__UQADD16(r, n) >> 8,
-		    __UQADD16(g, n) >> 8,
-		    __UQADD16(b, n) >> 8);
-    }
+        if (n < 0) {
+            return Color8(__UQSUB16(r, -n) >> 8,
+                __UQSUB16(g, -n) >> 8,
+                __UQSUB16(b, -n) >> 8,
+                __UQSUB16(a, -n) >> 8,
+                __UQSUB16(w, -n) >> 8,
+                __UQSUB16(u, -n) >> 8);
+        }
+        else {
+            return Color8(__UQADD16(r, n) >> 8,
+                __UQADD16(g, n) >> 8,
+                __UQADD16(b, n) >> 8,
+                __UQADD16(a, n) >> 8,
+                __UQADD16(w, n) >> 8,
+                __UQADD16(u, n) >> 8);
+        }
 #else
-    return Color8(clampi32((r+n) >> 8, 0, 255),
-                  clampi32((g+n) >> 8, 0, 255),
-                  clampi32((b+n) >> 8, 0, 255));
-#endif    
-  }
-
-  Color8 dither(int x, int y) const  {
-    return dither(color16_dither_matrix[x & 3][y & 3]);
-  }
-
-  uint16_t getShort(int byteorder, int byte) {
-    switch (byteorder >> (byte * 4) & 0x7) {
-      default: return r;
-      case 2: return g;
-      case 3: return b;
-      case 4: return std::min(r, std::min(g, b));
-      case 5: return r - std::min(r, std::min(g, b));
-      case 6: return g - std::min(r, std::min(g, b));
-      case 7: return b - std::min(r, std::min(g, b));
+        return Color8(clampi32((r + n) >> 8, 0, 255),
+            clampi32((g + n) >> 8, 0, 255),
+            clampi32((b + n) >> 8, 0, 255),
+            clampi32((a + n) >> 8, 0, 255),
+            clampi32((w + n) >> 8, 0, 255),
+            clampi32((u + n) >> 8, 0, 255));
+#endif
     }
-  }
 
-  void printTo(Print& p) {
-    p.write('#');
-    p.print(r);
-    p.write(',');
-    p.print(g);
-    p.write(',');
-    p.print(b);
-  }
+    Color8 dither(int x, int y) const {
+        return dither(Color16_dither_matrix[x & 3][y & 3]);
+    }
+
+    uint16_t getShort(int byteorder, int byte) {
+        switch (byteorder >> (byte * 4) & 0x7) {
+        default: return r;
+        case 2: return g;
+        case 3: return b;
+        case 4: return std::min(r, std::min(g, b));
+        case 5: return r - std::min(r, std::min(g, b));
+        case 6: return g - std::min(r, std::min(g, b));
+        case 7: return b - std::min(r, std::min(g, b));
+        }
+    }
+
+    void printTo(Print& p) {
+        p.write('#');
+        p.print(r);
+        p.write(',');
+        p.print(g);
+        p.write(',');
+        p.print(b);
+    }
 
 private:
-  static int f(int n, int C, int MAX) {
-    int k = n % 98304;
-    return MAX - C * clampi32(std::min(k, 65536 - k), 0, 16384) / 16384;
-  }
+    static int f(int n, int C, int MAX) {
+        int k = n % 98304;
+        return MAX - C * clampi32(std::min(k, 65536 - k), 0, 16384) / 16384;
+    }
 
 public:
-  // angle = 0 - 98304 (32768 * 3) (non-inclusive)
-  Color16 rotate(int angle) const {
-    int H;
-    if (!angle) return *this;
-    int MAX = std::max(r, std::max(g, b));
-    int MIN = std::min(r, std::min(g, b));
-    int C = MAX - MIN;
-    if (C == 0) return *this;  // Can't rotate something without color.
-    // Note 16384 = 60 degrees.
-    if (r == MAX) {
-      // r is biggest
-      H = 16384 * (g - b) / C;
-    } else if (g == MAX) {
-      // g is biggest
-      H = 16384 * (b - r) / C + 16384 * 2;
-    } else {
-      // b is biggest
-      H = 16384 * (r - g) / C + 16384 * 4;
+    // angle = 0 - 98304 (32768 * 3) (non-inclusive)
+    Color16 rotate(int angle) const {
+        int H;
+        if (!angle) return *this;
+        int MAX = std::max(r, std::max(g, b));
+        int MIN = std::min(r, std::min(g, b));
+        int C = MAX - MIN;
+        if (C == 0) return *this;  // Can't rotate something without color.
+        // Note 16384 = 60 degrees.
+        if (r == MAX) {
+            // r is biggest
+            H = 16384 * (g - b) / C;
+        }
+        else if (g == MAX) {
+            // g is biggest
+            H = 16384 * (b - r) / C + 16384 * 2;
+        }
+        else {
+            // b is biggest
+            H = 16384 * (r - g) / C + 16384 * 4;
+        }
+        H += angle;
+        return Color16(f(5 * 16384 + H, C, MAX),
+            f(3 * 16384 + H, C, MAX),
+            f(1 * 16384 + H, C, MAX),
+            f(2 * 16384 + H, C, MAX),
+            f(4 * 16384 + H, C, MAX),
+            f(6 * 16384 + H, C, MAX));
     }
-    H += angle;
-    return Color16(f(5*16384+H, C, MAX),
-                   f(3*16384+H, C, MAX),
-                   f(1*16384+H, C, MAX));
-  }
 
-  HSL toHSL() const {
-    int MAX = std::max(r, std::max(g, b));
-    int MIN = std::min(r, std::min(g, b));
-    int C = MAX - MIN;
-    int H;
-    // Note 16384 = 60 degrees.
-    if (C == 0) {
-      H = 0;
-    } else if (r == MAX) {
-      // r is biggest
-      H = 16384 * (g - b) / C;
-    } else if (g == MAX) {
-      // g is biggest
-      H = 16384 * (b - r) / C + 16384 * 2;
-    } else {
-      // b is biggest
-      H = 16384 * (r - g) / C + 16384 * 4;
-    }
-    int L = MIN + MAX;
-    float S = (MAX*2 - L) / (float)std::min<int>(L, 131072 - L);
-    return HSL(H / 98304.0, S, L / 131070.0);
-  }
-
-  explicit Color16(HSL hsl) {
-    float C = (1.0 - fabs(2 * hsl.L - 1.0)) * hsl.S;
-    float h = hsl.H * 6;
-    float X = C * (1 - fabs(fmod(h, 2.0) - 1));
-    float R=0.0, G=0.0, B=0.0;
-    switch ((int)floor(h)) {
-      case 0: R=C; G=X; break;
-      case 1: R=X; G=C; break;
-      case 2: G=C; B=X; break;
-      case 3: G=X; B=C; break;
-      case 4: R=X; B=C; break;
-      case 5: R=C; B=X; break;
-    }
-    float m = hsl.L - C / 2;
-    r = (R + m) * 65535;
-    g = (G + m) * 65535;
-    b = (B + m) * 65535;
-  }
-
-  uint16_t r, g, b;
+    uint16_t r, g, b, a, w, u;
 };
 
 struct SimpleColor {
@@ -388,19 +376,19 @@ struct OverDriveColor {
 // paint B over A: B + A * (1 - B.a)
 
 struct Color32 {
-  Color32(uint32_t r_, uint32_t g_, uint32_t b_) : r(r_), g(g_), b(b_) {}
-  Color16 operator>>(int shift) {
-    return Color16(r >> shift, g >> shift, b >> shift);
-  }
-  Color32 operator+(const Color32& other) { return Color32(r + other.r, g + other.g, b + other.b); }
-  uint32_t r, g, b;
+    Color32(uint32_t r_, uint32_t g_, uint32_t b_, uint32_t a_, uint32_t w_, uint32_t u_) : r(r_), g(g_), b(b_), a(a_), w(w_), u(u_) {}
+    Color16 operator>>(int shift) {
+        return Color16(r >> shift, g >> shift, b >> shift, a >> shift, w >> shift, u >> shift);
+    }
+    Color32 operator+(const Color32& other) { return Color32(r + other.r, g + other.g, b + other.b, a + other.a, w + other.w, u + other.u); }
+    uint32_t r, g, b, a, w, u;
 };
 
 inline Color32 operator*(const Color16& c, uint16_t x) {
-  return Color32(c.r * x, c.g * x, c.b * x);
+    return Color32(c.r * x, c.g * x, c.b * x, c.a * x, c.w * x, c.u * x);
 }
-inline Color16 operator+(const Color16& a, const Color16 &b) {
-  return Color16(a.r + b.r, a.g + b.g, a.b + b.b);
+inline Color16 operator+(const Color16& a, const Color16& b) {
+    return Color16(a.r + b.r, a.g + b.g, a.b + b.b, a.a + b.a, a.w + b.w, a.u + b.u);
 }
 
 // Unmultiplied RGBA (no overdrive), used as a temporary and makes optimization easier.

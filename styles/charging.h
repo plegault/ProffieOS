@@ -17,11 +17,11 @@ public:
     int black_mix = 128 + 100 * sinf(millis() / 500.0);
     float volts = battery_monitor.battery();
     Color8 colors[] = {
-      Color8(0,255,0),   // Green > 4.0
-      Color8(0,0,255),
-      Color8(255,128,0),
-      Color8(255,0,0),
-      Color8(255,0,0) 
+      Color8(0,255,0,0,0,0),   // Green > 4.0
+      Color8(0,0,255,0,0,0),
+      Color8(255,128,0,0,0,0),
+      Color8(255,0,0,0,0,0),
+      Color8(255,0,0,0,0,0)
     };
     float x = (4.0 - volts) * 2.0;
     int i = floorf(x);

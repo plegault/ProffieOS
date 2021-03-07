@@ -26,6 +26,9 @@ protected:
     itoa(color_.g, default_value + strlen(default_value), 10);
     strcat(default_value, ",");
     itoa(color_.b, default_value + strlen(default_value), 10);
+    itoa(color_.a, default_value + strlen(default_value), 10);
+    itoa(color_.w, default_value + strlen(default_value), 10);
+    itoa(color_.u, default_value + strlen(default_value), 10);
     
     const char* arg = CurrentArgParser->GetArg(argnum, "COLOR", default_value);
     if (arg) {
@@ -33,8 +36,11 @@ protected:
       int r = strtol(arg, &tmp, 0);
       int g = strtol(tmp+1, &tmp, 0);
       int b = strtol(tmp+1, NULL, 0);
+      int a = strtol(tmp + 1, NULL, 0);
+      int w = strtol(tmp + 1, NULL, 0);
+      int u = strtol(tmp + 1, NULL, 0);
       // TODO: color names?
-      color_ = Color16(r, g, b);
+      color_ = Color16(r, g, b, a, w, u);
     }
   }
 

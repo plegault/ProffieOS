@@ -28,9 +28,12 @@ struct CreeXPE2WhiteTemplate {
   static constexpr float R = milliohms / 1000.0;
 
   // LED color
-  static const int Red = 255;
-  static const int Green = 255;
-  static const int Blue = 255;
+  static const int Red = 0;
+  static const int Green = 0;
+  static const int Blue = 0;
+  static const int white = 255;
+  static const int amber = 0;
+  static const int uv = 0;
 };
 
 using CreeXPE2White = CreeXPE2WhiteTemplate<>;
@@ -46,6 +49,9 @@ struct CreeXPE2BlueTemplate {
   static const int Red = 0;
   static const int Green = 0;
   static const int Blue = 255;
+  static const int white = 0;
+  static const int amber = 0;
+  static const int uv = 0;
 };
 
 using CreeXPE2Blue = CreeXPE2BlueTemplate<>;
@@ -60,6 +66,9 @@ struct CreeXPE2GreenTemplate {
   static const int Red = 0;
   static const int Green = 255;
   static const int Blue = 0;
+  static const int white = 0;
+  static const int amber = 0;
+  static const int uv = 0;
 };
 
 using CreeXPE2Green = CreeXPE2GreenTemplate<>;
@@ -72,9 +81,12 @@ struct CreeXPE2PCAmberTemplate {
   static constexpr float P2Volts = 3.05;
   static constexpr float R = milliohms / 1000.0;
   // TODO(hubbe): Find correct values for PC Amber
-  static const int Red = 255;
-  static const int Green = 128;
+  static const int Red = 0;
+  static const int Green = 0;
   static const int Blue = 0;
+  static const int white = 0;
+  static const int amber = 255;
+  static const int uv = 0;
 };
 
 using CreeXPE2PCAmber = CreeXPE2PCAmberTemplate<>;
@@ -89,6 +101,9 @@ struct CreeXPE2RedTemplate {
   static const int Red = 255;
   static const int Green = 0;
   static const int Blue = 0;
+  static const int white = 0;
+  static const int amber = 0;
+  static const int uv = 0;
 };
 
 using CreeXPE2Red = CreeXPE2RedTemplate<>;
@@ -104,6 +119,9 @@ struct CreeXPE2RedOrangeTemplate {
   static const int Red = 255;
   static const int Green = 196;
   static const int Blue = 0;
+  static const int white = 0;
+  static const int amber = 0;
+  static const int uv = 0;
 };
 
 using CreeXPE2RedOrange = CreeXPE2RedOrangeTemplate<>;
@@ -116,9 +134,12 @@ struct CreeXPE2AmberTemplate {
   static constexpr float P2Volts = 2.2;
   static constexpr float R = milliohms / 1000.0;
   // TODO(hubbe): Find correct values for Amber
-  static const int Red = 255;
-  static const int Green = 100;
+  static const int Red = 0;
+  static const int Green = 0;
   static const int Blue = 0;
+  static const int white = 0;
+  static const int amber = 255;
+  static const int uv = 0;
 };
 
 using CreeXPE2Amber = CreeXPE2AmberTemplate<>;
@@ -220,5 +241,92 @@ struct CH3LED {
   static const int Green = 0;
   static const int Blue = 255;
 };
+
+struct hexred {
+	static constexpr float MaxAmps = 0.8;
+	static constexpr float MaxVolts = 2.6;
+	static constexpr float P2Amps = 0.7;
+	static constexpr float P2Volts = 2.6;
+	static constexpr float R = 2000;
+	static const int Red = 255;
+	static const int Green = 0;
+	static const int Blue = 0;
+	static const int white = 0;
+	static const int amber = 0;
+	static const int uv = 0;
+};
+
+struct hexamber {
+	static constexpr float MaxAmps = 0.8;
+	static constexpr float MaxVolts = 2.6;
+	static constexpr float P2Amps = 0.7;
+	static constexpr float P2Volts = 2.6;
+	static constexpr float R = 2000;
+	static const int Red = 0;
+	static const int Green = 0;
+	static const int Blue = 0;
+	static const int white = 0;
+	static const int amber = 255;
+	static const int uv = 0;
+};
+
+struct hexblue {
+	static constexpr float MaxAmps = 0.8;
+	static constexpr float MaxVolts = 3.7;
+	static constexpr float P2Amps = 0.7;
+	static constexpr float P2Volts = 3.7;
+	static constexpr float R = 1000;
+	static const int Red = 0;
+	static const int Green = 0;
+	static const int Blue = 255;
+	static const int white = 0;
+	static const int amber = 0;
+	static const int uv = 0;
+};
+
+struct hexgreen {
+	static constexpr float MaxAmps = 0.8;
+	static constexpr float MaxVolts = 3.7;
+	static constexpr float P2Amps = 0.7;
+	static constexpr float P2Volts = 3.7;
+	static constexpr float R = 1000;
+	static const int Red = 0;
+	static const int Green = 255;
+	static const int Blue = 0;
+	static const int white = 0;
+	static const int amber = 0;
+	static const int uv = 0;
+};
+
+struct hexwhite {
+	static constexpr float MaxAmps = 0.8;
+	static constexpr float MaxVolts = 3.7;
+	static constexpr float P2Amps = 0.7;
+	static constexpr float P2Volts = 3.7;
+	static constexpr float R = 1000;
+	static const int Red = 0;
+	static const int Green = 0;
+	static const int Blue = 0;
+	static const int white = 255;
+	static const int amber = 0;
+	static const int uv = 0;
+};
+
+struct hexuv {
+	static constexpr float MaxAmps = 0.8;
+	static constexpr float MaxVolts = 3.7;
+	static constexpr float P2Amps = 0.7;
+	static constexpr float P2Volts = 3.7;
+	static constexpr float R = 1000;
+	static const int Red = 0;
+	static const int Green = 0;
+	static const int Blue = 0;
+	static const int white = 0;
+	static const int amber = 0;
+	static const int uv = 255;
+};
+
+
+
 
 #endif

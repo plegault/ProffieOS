@@ -25,7 +25,7 @@
 template<int R, int G, int B>
 class Rgb {
 public:
-  static Color16 color() { return Color16(Color8(R,G,B)); }
+  static Color16 color() { return Color16(Color8(R,G,B,0,0,0)); }
   LayerRunResult run(BladeBase* base) {
     if (R == 0 && G == 0 && B == 0) return LayerRunResult::OPAQUE_BLACK_UNTIL_IGNITION;
     return LayerRunResult::UNKNOWN;
@@ -39,7 +39,7 @@ public:
 template<int R, int G, int B>
 class Rgb16 {
 public:
-  static Color16 color() { return Color16(R, G, B); }
+  static Color16 color() { return Color16(R, G, B, 0, 0, 0); }
   LayerRunResult run(BladeBase* base) {
     if (R == 0 && G == 0 && B == 0) return LayerRunResult::OPAQUE_BLACK_UNTIL_IGNITION;
     return LayerRunResult::UNKNOWN;
@@ -56,5 +56,31 @@ public:
     return RGBA_um_nod(Color16(R, G, B), false, A >> 1);
   }
 };
+
+template<int R, int G, int B, int A, int W, int U>
+class Rgbawu {
+public:
+    static Color16 color() { return Color16(Color8(R, G, B, A, W, U)); }
+    LayerRunResult run(BladeBase* base) {
+        if (R == 0 && G == 0 && B == 0 && A == 0 && W == 0 && U == 0) return LayerRunResult::OPAQUE_BLACK_UNTIL_IGNITION;
+        return LayerRunResult::UNKNOWN;
+    }
+    SimpleColor getColor(int led) {
+        return SimpleColor(color());
+    }
+};
+
+// Simple solid color with 16-bit precision.
+template<int R, int G, int B, int A, int W, int U>
+class Rgbawu16 {
+public:
+    static Color16 color() { return Color16(R, G, B, A, W, U); }
+    LayerRunResult run(BladeBase* base) {
+        if (R == 0 && G == 0 && B == 0 && A == 0 && W == 0 && U == 0) return LayerRunResult::OPAQUE_BLACK_UNTIL_IGNITION;
+        return LayerRunResult::UNKNOWN;
+    }
+    SimpleColor getColor(int led) { return SimpleColor(color()); }
+};
+
 
 #endif

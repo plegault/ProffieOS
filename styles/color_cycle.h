@@ -19,7 +19,7 @@ template<class COLOR, int percentage, int rpm,
          int on_percentage = percentage,
          int on_rpm = rpm,
          int fade_time_millis = 1,
-         class OFF_COLOR = Rgb<0,0,0> >
+         class OFF_COLOR = Rgbawu<0,0,0,0,0,0> >
 class ColorCycle {
 public:
   bool run(BladeBase* base) {
@@ -50,7 +50,7 @@ public:
     } else if (current_percentage == 0.0) {
       start_ = 0;
       end_ = 0;
-      keep_running = !is_same_type<OFF_COLOR, Rgb<0,0,0> >::value;
+      keep_running = !is_same_type<OFF_COLOR, Rgbawu<0,0,0,0,0,0> >::value;
     } else {
       end_ = fract(pos_ + current_percentage / 100.0) * num_leds_;
     }
