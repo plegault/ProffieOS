@@ -41,38 +41,19 @@ void LSFree(T *memory) {
   if (IsHeap(memory)) LSFreeObject((T*)memory);
 }
 
-// Movable, but not copyable
 template<class T>
 class LSPtr {
 public:
   LSPtr() : ptr_(nullptr) {}
-  explicit LSPtr(const T* ptr) : ptr_(ptr) {}
   ~LSPtr() { Free(); }
   void Free() { LSFree(ptr_); }
-  const T* get() const { return ptr_; }
-  const T* take() { const T* ret = ptr_; ptr_ = nullptr; return ret; }
-  void set(const T* t) {
+
+  void operator=(const T* t) {
     Free();
     ptr_ = t;
   }
-    
-  LSPtr& operator=(const T* t) {
-    set(t);
-    return *this;
-  }
-  // move assignment
-  LSPtr& operator=(LSPtr&& other) {
-    std::swap(ptr_, other.ptr_);
-    return *this;
-  }
-  // move constructor
-  LSPtr(LSPtr&& other) {
-    set(other.take());
-  }
+  const T* get() { return ptr_; }
 private:
-  LSPtr(LSPtr&); // prevent copy constructor
-  LSPtr& operator=(const LSPtr&); // prevent copy assignment
-  
   const T* ptr_;
 };
 

@@ -45,6 +45,7 @@ private:
   BUMP_WIDTH_FRACTION fraction_;
   int location_;
   int mult_;
+  int shift_;
 };
 
 template<int HUMP_WIDTH>

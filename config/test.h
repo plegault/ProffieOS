@@ -38,7 +38,7 @@ Preset presets[] = {
    { "TeensySF", "tracks/mercury.wav",
     StylePtr<InOutSparkTip<EASYBLADE(MAGENTA, WHITE), 300, 800> >(), "magenta"},
    { "SmthJedi", "tracks/uranus.wav",
-    StylePtr<ColorSequence<500,Red,Green,Blue,AMBER,WHITE,UV>, 300, 800>(), "demo color"}
+    StylePtr<ColorSequence<500,Red,Green,Blue,AMBER,WHITE,UV>>(), "demo color"}
 };
 BladeConfig blades[] = {
  { 0, SimpleBladePtr<hexred, hexblue, hexgreen, hexamber, hexwhite, hexuv, bladePowerPin1, bladePowerPin2, bladePowerPin3, bladePowerPin4, bladePowerPin5, bladePowerPin6>(), CONFIGARRAY(presets) },

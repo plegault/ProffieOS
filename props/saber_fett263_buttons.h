@@ -857,7 +857,6 @@ SaberFett263Buttons() : PropBase() {}
           hybrid_font.PlayCommon(&SFX_faston);
         }
         return;
-      default: break; // avoid compiler warnings
     }
   }
 

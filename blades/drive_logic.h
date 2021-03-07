@@ -8,7 +8,7 @@ template<typename T> struct ToVoid { typedef void Type; };
 template<class LED, typename Enable=void>
 struct ColorSelector {
   static Color8 getColor8() {
-    return Color8(LED::Red, LED::Green, LED::Blue);
+    return Color8(LED::Red, LED::Green, LED::Blue, LED::amber, LED::white, LED::uv);
   }
   static int Select(Color16 c) {
     return c.select(Color16(getColor8()));
@@ -19,7 +19,7 @@ struct ColorSelector {
 template<class LED>
 struct ColorSelector<LED, typename ToVoid<typename LED::SUBTRACT>::Type>  {
   static Color8 getColor8() {
-    return Color8(LED::Red, LED::Green, LED::Blue);
+    return Color8(LED::Red, LED::Green, LED::Blue, LED::Amber, LED::White, LED::Uv);
   }
   static int Select(Color16 c) {
     ColorSelector<typename LED::SUBTRACT> subtract_selector;
@@ -32,7 +32,7 @@ struct ColorSelector<LED, typename ToVoid<typename LED::SUBTRACT>::Type>  {
 template<class LED>
 struct ColorSelector<LED, typename ToVoid<typename LED::CustomColorSelector>::Type> {
   static Color8 getColor8() {
-    return Color8(LED::Red, LED::Green, LED::Blue);
+    return Color8(LED::Red, LED::Green, LED::Blue, LED::Amber, LED::White, LED::Uv);
   }
   static int Select(Color16 c) {
     typename LED::CustomColorSelector selector;

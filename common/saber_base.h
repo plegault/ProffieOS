@@ -156,36 +156,29 @@ public:
     return mixhum;
   }
 
-  static float sound_length;
-
-#define SABERFUN(NAME, EFFECT, TYPED_ARGS, ARGS)		\
+#define SABERFUN(NAME, TYPED_ARGS, ARGS)                        \
 public:                                                         \
   static void Do##NAME TYPED_ARGS {                             \
-    sound_length = 0.0                                          \
     CHECK_LL(SaberBase, saberbases, next_saber_);               \
     for (SaberBase *p = saberbases; p; p = p->next_saber_) {    \
       p->SB_##NAME ARGS;                                        \
     }                                                           \
-    for (SaberBase *p = saberbases; p; p = p->next_saber_) {    \
-      p->SB_##NAME##2 ARGS;                                     \
-    }                                                           \
     CHECK_LL(SaberBase, saberbases, next_saber_);               \
   }                                                             \
                                                                 \
-  virtual void SB_##NAME TYPED_ARGS {}                          \
-  virtual void SB_##NAME##2 TYPED_ARGS {}
+  virtual void SB_##NAME TYPED_ARGS {}
 
 #define SABERBASEFUNCTIONS()						\
-  SABERFUN(Effect, effect, (EffectType effect, float location), (effect, location)); \
-  SABERFUN(PreOn, EFFECT_PREON, (float* delay), (delay));			\
-  SABERFUN(On, EFFECT_IGNITION, (), ());				\
-  SABERFUN(Off, EFFECT_RETRACTION, (OffType off_type), (off_type));	\
-  SABERFUN(BladeDetect, EFFECT_NONE, (bool detected), (detected));	\
-  SABERFUN(Change, EFFECT_CHANGE, (ChangeType change_type), (change_type)); \
+  SABERFUN(Effect, (EffectType effect, float location), (effect, location)); \
+  SABERFUN(PreOn, (float* delay), (delay));				\
+  SABERFUN(On, (), ());                  				\
+  SABERFUN(Off, (OffType off_type), (off_type));			\
+  SABERFUN(BladeDetect, (bool detected), (detected));			\
+  SABERFUN(Change, (ChangeType change_type), (change_type));		\
 									\
-  SABERFUN(Top, EFFECT_NONE, (uint64_t total_cycles), (total_cycles));	\
-  SABERFUN(IsOn, EFFECT_NONE, (bool* on), (on));			\
-  SABERFUN(Message, EFFECT_NONE, (const char* msg), (msg));		\
+  SABERFUN(Top, (uint64_t total_cycles), (total_cycles));		\
+  SABERFUN(IsOn, (bool* on), (on));					\
+  SABERFUN(Message, (const char* msg), (msg));				\
 
   
   SABERBASEFUNCTIONS();
@@ -244,12 +237,6 @@ public:                                                         \
   static void SetVariation(uint32_t v) {
     current_variation_ = v;
   }
-
-#ifdef DYNAMIC_BLADE_DIMMING
-  static int dimming_;
-  static int GetCurrentDimming() { return dimming_; }
-  static void SetDimming(int dimming) { dimming_ = dimming; }
-#endif  
 
   enum ColorChangeMode {
     COLOR_CHANGE_MODE_NONE,

@@ -123,9 +123,9 @@ public:
     } else if (h < 512) {
       c.c = c1_.getColor(led).c.mix(c2_.getColor(led).c, h - 256);
     } else if (h < 768) {
-      c.c = c2_.getColor(led).c.mix(Color16(65535,65535,65535), h - 512);
+      c.c = c2_.getColor(led).c.mix(Color16(65535,65535,65535,65535,65535,65535), h - 512);
     } else {
-      c.c = Color16(65535, 65535, 65535);
+      c.c = Color16(65535, 65535, 65535,65535,65535,65535);
     }
     return c;
   }

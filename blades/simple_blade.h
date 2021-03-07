@@ -42,7 +42,7 @@ public:
   void Deactivate() override {}
   void set(const Color16& c) override {}
   void set_overdrive(const Color16& c) override {}
-  Color8 getColor8() const { return Color8(0,0,0); }
+  Color8 getColor8() const { return Color8(0,0,0,0,0,0); }
 };
 
 template<>
@@ -52,7 +52,7 @@ public:
   void Deactivate() override {}
   void set(const Color16& c) override {}
   void set_overdrive(const Color16& c) override {}
-  Color8 getColor8() const { return Color8(0,0,0); }
+  Color8 getColor8() const { return Color8(0,0,0,0,0,0); }
 };
 template<class ... LEDS>
 class MultiChannelLED {};
@@ -64,7 +64,7 @@ public:
   void Deactivate() override {}
   void set(const Color16& c) override {}
   void set_overdrive(const Color16& c) override {}
-  Color8 getColor8() const { return Color8(0,0,0); }
+  Color8 getColor8() const { return Color8(0,0,0,0,0,0); }
 };
 
 template<class LED, class... LEDS>
@@ -262,18 +262,23 @@ private:
   bool power_ = false;
 };
 
-template<class LED1, class LED2, class LED3, class LED4,
+template<class LED1, class LED2, class LED3, class LED4, class LED5, class LED6,
           int pin1 = bladePowerPin1,
           int pin2 = bladePowerPin2,
           int pin3 = bladePowerPin3,
-          int pin4 = bladePin>
+          int pin4 = bladePowerPin4,
+          int pin5 = bladePowerPin5,
+          int pin6 = bladePowerPin6>
 class BladeBase *SimpleBladePtr() {
   static Simple_Blade<
     MultiChannelLED<
       PWMPin<pin1, LED1>,
       PWMPin<pin2, LED2>,
       PWMPin<pin3, LED3>,
-      PWMPin<pin4, LED4>
+      PWMPin<pin4, LED4>,
+      PWMPin<pin5, LED5>,
+      PWMPin<pin6, LED6>
+
     >
   > blade;
   return &blade;

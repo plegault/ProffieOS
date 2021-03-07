@@ -16,7 +16,6 @@ const unsigned int maxLedsPerStrip = 144;
 
 #ifdef CONFIG_PRESETS
 Preset presets[] = {
-  { "vadert~1", "tracks/vader.wav", ""},
   { "micom2", "tracks/cantina.wav", ""},
   { "vader", "tracks/vader.wav", ""},
   { "TeensySF", "tracks/title.wav", ""},

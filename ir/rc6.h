@@ -161,7 +161,7 @@ public:
     output->signal(!bit, 889);
   }
   void EncodeByte(IRInterface* output, uint8_t x) {
-    for (int i = 0; i < 8; i++, x<<=1) {
+    for (int i = 0; i < 8; i++) {
       EncodeBit(output, (x & 0x80) == 0x80);
     }
   }
